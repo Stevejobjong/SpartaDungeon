@@ -201,6 +201,9 @@
             this.description = description;
         }
     }
+    /// <summary>
+    /// 아이템을 저장하는 클래스
+    /// </summary>
     public class Inventory {
         public Item[] itemArr;
         public int idx;
