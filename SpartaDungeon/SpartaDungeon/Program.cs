@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using Newtonsoft.Json;
 
 namespace SpartaDungeon
 {
@@ -9,16 +10,15 @@ namespace SpartaDungeon
 
         static void Main(string[] args)
         {
-            GameDataSetting();
+            GameDataInit();
             DisplayGameIntro();
         }
 
-        static void GameDataSetting()
+        static void GameDataInit()
         {
             // 캐릭터 정보 세팅
-            player = new Character("Chad", "전사", 1, 10, 5, 100, 1500);
+            player = new Character("Chad", "전사", 1, 10.0f, 5, 100, 1500);
             shop = new ItemShop();
-
             // 아이템 정보 세팅
 
             shop.InputItem(new Item("낡은 검", Item.ItemType.Weapon, 2, 0, "쉽게 볼 수 있는 낡은 검입니다.", 200));
@@ -27,7 +27,6 @@ namespace SpartaDungeon
             shop.InputItem(new Item("신성한 검", Item.ItemType.Weapon, 10, 0, "신성한 힘이 깃든 검입니다.", 1000));
             shop.InputItem(new Item("무쇠갑옷", Item.ItemType.Armor, 0, 5, "무쇠로 만들어져 튼튼한 갑옷입니다.", 400));
         }
-
         static void DisplayGameIntro()
         {
             Console.Clear();
@@ -40,9 +39,10 @@ namespace SpartaDungeon
             Console.WriteLine("3. 상점");
             Console.WriteLine("4. 던전입장");
             Console.WriteLine("5. 휴식하기");
+            Console.WriteLine("6. 게임 데이터");
             Console.WriteLine();
 
-            int input = CheckValidInput(1, 5);
+            int input = CheckValidInput(1, 6);
             switch (input)
             {
                 case 1:
@@ -60,8 +60,72 @@ namespace SpartaDungeon
                 case 5:
                     TakeRest();
                     break;
-
+                case 6:
+                    DataSetting();
+                    break;
             }
+        }
+
+        private static void DataSetting()
+        {
+            StringBuilder sb = new StringBuilder();
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("게임 데이터 관리");
+            Console.ResetColor();
+            Console.WriteLine("게임 데이터를 저장하거나 불러옵니다.");
+            Console.WriteLine();
+            Console.WriteLine($"Lv.{player.Level}");
+            Console.WriteLine($"{player.Name}({player.Job})");
+
+            sb.AppendFormat($"공격력 : {player.Atk}");
+            string str = player.itemAtk > 0 ? $" (+{player.itemAtk})" : "";
+            sb.AppendFormat(str);
+            Console.WriteLine(sb.ToString());
+
+            sb.Clear();
+            sb.AppendFormat($"방어력 : {player.Def}");
+            str = player.itemDef > 0 ? $" (+{player.itemDef})" : "";
+            sb.AppendFormat(str);
+            Console.WriteLine(sb.ToString());
+
+            Console.WriteLine($"체력 : {player.Hp}");
+            Console.WriteLine($"Gold : {player.Gold} G");
+            Console.WriteLine();
+            Console.WriteLine("1. 데이터 저장");
+            Console.WriteLine("2. 데이터 불러오기");
+            Console.WriteLine("0. 나가기");
+            int input = CheckValidInput(0, 2);
+            switch (input)
+            {
+                case 1:
+                    SaveJsonData();
+                    DataSetting();
+                    break;
+                case 2:
+                    LoadJsonData();
+                    DataSetting();
+                    break;
+                case 0:
+                    DisplayGameIntro();
+                    break;
+            }
+
+        }
+
+        static void SaveJsonData()
+        {
+            //TestData.json 파일에 현재 player 상태 저장
+            string strJson = JsonConvert.SerializeObject(player);
+            File.WriteAllText(@"TestData.json", strJson);
+
+        }
+        static void LoadJsonData()
+        {
+            //TestData.json 파일에 현재 player 상태 불러오기
+            string strJson = File.ReadAllText(@"TestData.json");
+            player = JsonConvert.DeserializeObject<Character>(strJson);
+            //player.Gold = clone.Gold;
         }
 
         private static void TakeRest()
@@ -69,6 +133,7 @@ namespace SpartaDungeon
             Console.Clear();
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("휴식하기");
+            Console.ResetColor();
             Console.WriteLine($"500 G 를 내면 체력을 회복할 수 있습니다. (보유 골드 : {player.Gold} G)");
             Console.WriteLine();
             Console.WriteLine("1. 휴식하기");

@@ -13,7 +13,7 @@
         public int itemDef;     //장착 아이템으로 오르는 방어력
         public Inventory inventory;
         public int ClearCnt;
-        public Character(string name, string job, int level, int atk, int def, int hp, int gold)
+        public Character(string name, string job, int level, float atk, int def, int hp, int gold)
         {
             ClearCnt = 0;
             inventory = new Inventory();
